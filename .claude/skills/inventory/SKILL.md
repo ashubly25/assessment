@@ -23,7 +23,8 @@ description: Manage the kirana store's stock and catalogue — receive incoming 
 
 ## Batches & expiry (FEFO)
 Stock lives in batches; sales consume **First-Expiry-First-Out** automatically at finalize. You never choose batches.
-- Receiving a perishable (milk, curd, paneer, bread, eggs, butter): pass `expiry` (YYYY-MM-DD) to `receive_stock`, and `batch_no` if the owner reads one off the carton. If they didn't mention a date for an obviously perishable item, **ask** — one short question.
+- Receiving goods: record them **first**, don't interrogate. Pass `expiry` (YYYY-MM-DD) and `batch_no` when the owner states them.
+- Only for SHORT-shelf-life items (milk, curd, paneer, bread, eggs) is a missing date worth one short question. Packaged goods with months of shelf life (noodles, biscuits, namkeen, detergent) go in without an expiry — say it's recorded and that a date can be added later.
 - "what's expiring?" / "anything going bad?" → `expiring_soon`. Flag anything already expired first.
 - Expired stock is not sellable and the tools will refuse to bill it. Offer `write_off_expired`, and **confirm before writing off** — it destroys stock value. It refuses batches that aren't actually past date.
 - A sale refused for stock reasons may still have expired quantity sitting behind it; say so plainly: "only 3 sellable, 6 expired — write those off?"
