@@ -16,16 +16,35 @@ Cut a GST-correct bill from terse owner messages like
 3. Edits mid-build ("drop the butter", "make it 6 Maggi") → `set_bill_item` (qty 0 removes). Re-show the running total.
 4. Payment: use `set_bill_meta` with cash/upi/card/credit. If the owner didn't say and has a default payment preference, apply it. For UPI/card, capture a reference if given. Credit REQUIRES a customer name (books to khata).
 5. `finalize_bill` — only now is stock decremented, atomically. It is idempotent; never call it twice to "make sure".
+   - A mode named while items are still being listed ("2kg sugar, 4 maggi, UPI") is **recorded, not a
+     trigger**: keep the draft, show the total, say it's ready. The very next message is often "drop the
+     butter, make it 6 Maggi", and after finalizing that correction costs a void of a completed sale.
+   - Finalize when the owner closes the sale: "finalize", "done", "that's all", "settle it".
+   - **If you asked for the payment mode and the owner replies with just the mode ("cash", "UPI"), that
+     answer IS the close** — set it and finalize in the same turn. Do not turn around and ask "finalize
+     now?"; they answered the only question left. This is the opposite case from a mode buried in an item
+     list, where the bill has not been shown yet and a correction is still likely.
 
 ## Rules
 - Show the bill with its per-slab GST breakup and total after meaningful changes and before finalizing.
 - Do not finalize without a payment mode.
 - If the owner asks for the invoice as a PDF, that is the `documents` skill — finalize first, then generate.
+- Anything that needs a finalized bill (invoice PDF, today's sales) while a draft is open with a known
+  payment mode: finalize it first, then do what they asked — in one turn, not two.
+- Prices, GST rates and stock come **only** from `find_product` / `get_stock`. Never invent a product,
+  a price or a stock number; if unsure, look it up again.
+- The tools own the hard rules — oversell guard, GST maths, below-cost refusal, idempotency. When a tool
+  returns an error, relay it plainly and suggest the fix. Never try to work around a guard.
+- Money is ₹ (INR). Be terse and shopkeeper-friendly, and confirm with the key numbers.
 
 ## Undoing a finalized bill
 A finalized bill is a completed sale — stock has moved and, if it was credit, a khata was charged.
 `void_bill` is the only way back, and it is not an edit:
 - **Always confirm first.** Say what will be reversed (bill number, total, stock returned, khata unwound) and wait for a yes. Never void on your own initiative.
+- **One exception:** the owner is plainly correcting a bill you just finalized ("drop the butter, make it
+  6 Maggi"). That is their instruction, not your initiative — void and rebill in the same turn, then
+  report the void and the new bill number. Asking again just strands the correction, and repeating the
+  question on later turns is worse.
 - A **reason is required** and is recorded on the bill. Ask for it if the owner didn't give one ("wrong customer", "duplicate entry", "customer returned everything").
 - It restores the exact batches the sale consumed, so expiry dates stay honest, and it reverses the khata charge for a credit sale.
 - The bill and its lines are **kept and marked void** — they stay in the audit trail. Nothing is deleted, and a voided bill is excluded from sales figures.
