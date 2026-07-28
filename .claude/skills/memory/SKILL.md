@@ -23,3 +23,8 @@ Preferences live in the database, keyed to this chat, and PERSIST across `/new` 
 - Reply in the stored `language` without being reminded — it survives `/new` like every other preference.
 
 The preferences are also injected into your system context each turn, so you usually already know them — but use `get_preferences` if you need to double-check.
+
+## Dropping a preference
+"stop assuming UPI" / "forget my default atta" → `forget_preference` with that key. Confirm which one
+you removed; the rest are untouched. Prefer this over setting an empty value — a blank preference still
+reads as a standing instruction.

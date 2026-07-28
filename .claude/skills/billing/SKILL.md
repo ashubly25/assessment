@@ -9,6 +9,10 @@ Cut a GST-correct bill from terse owner messages like
 `make a bill: 2kg sugar, 1 aashirvaad atta, 4 maggi, 1 amul butter, UPI`.
 
 ## Flow
+0. `start_bill` opens a draft for this chat. `add_bill_item` auto-opens one, so call `start_bill`
+   explicitly only when the owner clearly begins a fresh bill and you want it on the record; it never
+   opens a second draft alongside an open one. `show_bill` prints the current draft with its GST
+   breakup — use it when the owner asks "what's on the bill?" or after several edits.
 1. For EACH item, call `find_product` to get the real product id, price and GST. Never assume a price.
    - If a term is ambiguous (e.g. "atta" → Aashirvaad 5kg vs loose wheat atta), ASK which one before adding it. Add the rest meanwhile if unambiguous.
    - Quantities: loose items are in kg/g/litre (e.g. "2kg sugar" → qty 2). Packaged items are counts ("4 maggi" → qty 4).
