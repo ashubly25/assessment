@@ -6,8 +6,12 @@ description: Produce the store's real documents — a GST-correct PDF invoice fo
 # Documents
 
 ## PDF invoice
-"send me that bill as a PDF" → `generate_invoice_pdf` with the bill id.
-- The bill must be FINALIZED first. If the owner refers to "that bill" / "the last bill", use the most recent finalized bill id you just created.
+"send me that bill as a PDF" → `generate_invoice_pdf`.
+- The bill must be FINALIZED first.
+- "that bill" / "the last bill" / "the invoice" with no number → call it with **no `bill_id`**; the tool
+  defaults to the most recent finalized bill in this chat. Do NOT ask which bill — the owner said "that
+  bill" because they mean the obvious one. Name the bill number in your reply so they can catch a mismatch.
+- Only ask when they clearly mean an older bill and the reference is genuinely unresolvable.
 - The shop name, GSTIN and address come from preferences (see memory skill) — no need to ask each time.
 
 ### Branding
